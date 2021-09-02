@@ -1,0 +1,26 @@
+# 2 phase process. one for generating build and second for taking output of build and 
+#builind from second base image. first step requires node:alpine image and second step only 
+# requires nginx image.
+
+# build phase
+FROM node:alpine as builder
+
+WORKDIR /app
+
+COPY package.json .
+
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+#run phase
+
+FROM nginx
+
+COPY --from=builder /app/build /usr/share/nginx/html
+# no need to put a start command as container would do that as its default command.
+
+
+
